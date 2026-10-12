@@ -1,0 +1,145 @@
+{
+  "model": "gpt-6-luna",
+  "passed": 23,
+  "total": 23,
+  "results": [
+    {
+      "part": "A",
+      "test": "MCP server reachable over stdio with 25 tools",
+      "passed": true,
+      "detail": "[\"add_ticket_note\", \"approve_request\", \"check_product_stock\", \"draft_customer_message\", \"get_financial_status\", \"get_lease\", \"get_product_pricing\", \"get_ticket\", \"list_approval_requests\", \"list_customer_drafts\", \"list_inventory\", \"list_invoices\", \"list_payments\", \"list_tickets\", \"list_vendors\", \"plan_restock\", \"quote_bulk_order\", \"record_discount_decision\", \"reject_request\", \"request_discount_app…"
+    },
+    {
+      "part": "A",
+      "test": "five agents built",
+      "passed": true,
+      "detail": "[\"Boss\", \"Inventory\", \"Accounting\", \"Facilities\", \"Customer Service\"]"
+    },
+    {
+      "part": "A",
+      "test": "Boss: sees its 9 MCP tools + delegate, no human-only tools",
+      "passed": true,
+      "detail": "[\"add_ticket_note\", \"delegate\", \"get_financial_status\", \"get_ticket\", \"list_approval_requests\", \"list_customer_drafts\", \"list_tickets\", \"quote_bulk_order\", \"record_discount_decision\", \"update_ticket_status\"]"
+    },
+    {
+      "part": "A",
+      "test": "Inventory: sees its 7 MCP tools + delegate, no human-only tools",
+      "passed": true,
+      "detail": "[\"add_ticket_note\", \"check_product_stock\", \"delegate\", \"get_product_pricing\", \"get_ticket\", \"list_inventory\", \"list_vendors\", \"plan_restock\"]"
+    },
+    {
+      "part": "A",
+      "test": "Accounting: sees its 12 MCP tools + delegate, no human-only tools",
+      "passed": true,
+      "detail": "[\"add_ticket_note\", \"delegate\", \"get_financial_status\", \"get_product_pricing\", \"get_ticket\", \"list_approval_requests\", \"list_invoices\", \"list_payments\", \"list_vendors\", \"plan_restock\", \"quote_bulk_order\", \"request_payment\", \"request_purchase_order\"]"
+    },
+    {
+      "part": "A",
+      "test": "Facilities: sees its 6 MCP tools + delegate, no human-only tools",
+      "passed": true,
+      "detail": "[\"add_ticket_note\", \"delegate\", \"get_financial_status\", \"get_lease\", \"get_ticket\", \"list_approval_requests\", \"list_payments\"]"
+    },
+    {
+      "part": "A",
+      "test": "Customer Service: sees its 7 MCP tools + delegate, no human-only tools",
+      "passed": true,
+      "detail": "[\"add_ticket_note\", \"check_product_stock\", \"delegate\", \"draft_customer_message\", \"get_product_pricing\", \"get_ticket\", \"list_customer_drafts\", \"quote_bulk_order\"]"
+    },
+    {
+      "part": "A",
+      "test": "Inventory -> MCP check_product_stock returns real data (tee S qty 0)",
+      "passed": true,
+      "detail": "[{\"found\": true, \"sku\": \"CC-TEE-WHITE\", \"name\": \"Classic Bulldog Tee\", \"size\": \"S\", \"qty_available\": 0, \"in_stock\": false, \"location\": \"Aisle B\"}]"
+    },
+    {
+      "part": "A",
+      "test": "full connectivity: 20/20 delegation directions work",
+      "passed": true,
+      "detail": "[\"Boss->Inventory\", \"Boss->Accounting\", \"Boss->Facilities\", \"Boss->Customer Service\", \"Inventory->Boss\", \"Inventory->Accounting\", \"Inventory->Facilities\", \"Inventory->Customer Service\", \"Accounting->Boss\", \"Accounting->Inventory\", \"Accounting->Facilities\", \"Accounting->Customer Service\", \"Facilities->Boss\", \"Facilities->Inventory\", \"Facilities->Accounting\", \"Facilities->Customer Service\", \"Custom…"
+    },
+    {
+      "part": "A",
+      "test": "Boss -> Inventory -> Accounting chain works (depth 2)",
+      "passed": true,
+      "detail": "delegations used: 2"
+    },
+    {
+      "part": "A",
+      "test": "Inventory -> Boss refused (already in chain: no loops)",
+      "passed": true,
+      "detail": "REFUSED: Boss is already working on this chain (Boss -> Inventory); that would loop."
+    },
+    {
+      "part": "A",
+      "test": "Accounting -> Facilities refused at depth 2 (depth limit enforced; test set to 2)",
+      "passed": true,
+      "detail": "REFUSED: Delegation depth limit (2) reached. Finish with what you have."
+    },
+    {
+      "part": "A",
+      "test": "7th delegation refused (cap of 6 per run)",
+      "passed": true,
+      "detail": "[\"ok\", \"ok\", \"ok\", \"ok\", \"ok\", \"ok\", \"This run already used all 6 delegations. Finish with what you have.\"]"
+    },
+    {
+      "part": "A",
+      "test": "depth 4: Boss > Inventory > Accounting > Facilities > Customer Service works; CS > Boss refused (loop)",
+      "passed": true,
+      "detail": "{\"delegations\": 4, \"refused\": [\"REFUSED: Boss is already working on this chain (Boss -> Inventory -> Accounting -> Facilities -> Customer Service); that would loop.\"]}"
+    },
+    {
+      "part": "A",
+      "test": "agent limit: Inventory forced to answer on step 5 (4 tool steps + final), no 6th call",
+      "passed": true,
+      "detail": "{\"steps\": {\"Inventory\": 5}, \"out\": \"AgentReport\"}"
+    },
+    {
+      "part": "A",
+      "test": "agent limit hard stop: stubborn agent stopped by AgentStepLimit at 5 steps",
+      "passed": true,
+      "detail": "{\"steps\": {\"Inventory\": 5}, \"out\": \"AgentStepLimit('Inventory reached its 5-step limit (5 used).')\"}"
+    },
+    {
+      "part": "A",
+      "test": "team limit 4: Boss > Inventory wraps up gracefully within 4 steps",
+      "passed": true,
+      "detail": "{\"total\": 4, \"by_agent\": {\"Boss\": 2, \"Inventory\": 2}}"
+    },
+    {
+      "part": "A",
+      "test": "team limit hard stop: stubborn team stopped without exceeding 4 steps",
+      "passed": true,
+      "detail": "{\"total\": 4, \"out\": \"TicketStepLimit('The team reached the 4-step limit for this ticket (4 used).')\"}"
+    },
+    {
+      "part": "A",
+      "test": "parallel delegations: Inventory never exceeds 5 steps even with two copies running at once",
+      "passed": true,
+      "detail": "{\"by_agent\": {\"Boss\": 2, \"Accounting\": 2, \"Customer Service\": 2, \"Inventory\": 5}, \"total\": 11, \"stops\": [\"Inventory reached its 5-step limit (5 used).\", \"Inventory reached its 5-step limit (5 used).\"]}"
+    },
+    {
+      "part": "A",
+      "test": "repeat call blocked for the same agent; another agent gets the cached result (no new MCP call)",
+      "passed": true,
+      "detail": "[\"blocked: same agent, same arguments, nothing changed since\", \"served from this run's cache (no new MCP call)\"]"
+    },
+    {
+      "part": "A",
+      "test": "after a write, the same read runs again for real (cache cleared)",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "part": "A",
+      "test": "Boss skips Customer Service -> backend adds the required reply step and a draft is saved",
+      "passed": true,
+      "detail": "{\"reply\": \"drafted by the required reply step\", \"system_events\": [\"delegate\", \"delegation_result\"]}"
+    },
+    {
+      "part": "A",
+      "test": "Boss delegates to Customer Service -> 'drafted by the team', no extra step",
+      "passed": true,
+      "detail": "drafted by the team"
+    }
+  ]
+}

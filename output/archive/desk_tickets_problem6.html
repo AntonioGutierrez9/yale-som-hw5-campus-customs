@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs · Desk Tickets</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #111a2e;
+    --panel-2: #0e1628;
+    --line: #23314f;
+    --text: #e6eaf2;
+    --muted: #9aa7bd;
+    --faint: #6b7a93;
+    --accent: #4f8cff;
+    --accent-soft: rgba(79, 140, 255, 0.14);
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --boss: #f5b546;
+    --inventory: #3ccf8e;
+    --accounting: #48b9f2;
+    --facilities: #ad8cff;
+    --cs: #f47cbd;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px 600px at 10% -10%, #15244a 0%, transparent 60%), var(--bg);
+    color: var(--text);
+    font: 15px/1.6 "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+  }
+  code, .mono { font-family: "Cascadia Code", Consolas, "SFMono-Regular", Menlo, monospace; }
+
+  /* ---------- Header ---------- */
+  header.top {
+    max-width: 1240px; margin: 0 auto; padding: 32px 24px 8px;
+    display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: flex-end; justify-content: space-between;
+  }
+  .brand small {
+    display: block; color: var(--accent); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: 12px;
+  }
+  .brand h1 { margin: 2px 0 4px; font-size: 28px; letter-spacing: -.01em; }
+  .brand p { margin: 0; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* ---------- Agent badges ---------- */
+  .agent {
+    --c: var(--accent);
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 10px 2px 8px; border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+    background: color-mix(in srgb, var(--c) 14%, transparent);
+    color: var(--c); font-weight: 600; font-size: 13px; white-space: nowrap;
+  }
+  .agent::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .agent.boss { --c: var(--boss); }
+  .agent.inventory { --c: var(--inventory); }
+  .agent.accounting { --c: var(--accounting); }
+  .agent.facilities { --c: var(--facilities); }
+  .agent.cs { --c: var(--cs); }
+  .arrow { color: var(--faint); font-weight: 700; margin: 0 2px; }
+  .slash { color: var(--faint); margin: 0 1px; }
+
+  /* ---------- Tabs ---------- */
+  nav.tabs {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .tabs .inner { max-width: 1240px; margin: 0 auto; padding: 10px 24px; display: flex; gap: 6px; overflow-x: auto; }
+  .tab {
+    appearance: none; border: 1px solid transparent; background: transparent; color: var(--muted);
+    padding: 9px 16px; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .tab:hover { color: var(--text); background: rgba(255,255,255,.04); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tab[aria-selected="true"] { color: var(--text); background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+  .tab .num { font-size: 12px; color: var(--faint); font-weight: 600; }
+  .tab[aria-selected="true"] .num { color: var(--accent); }
+
+  main { max-width: 1240px; margin: 0 auto; padding: 24px 24px 64px; }
+  section.panel[hidden] { display: none; }
+
+  /* ---------- Ticket header ---------- */
+  .ticket-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 18px; }
+  .ticket-id {
+    font-family: "Cascadia Code", Consolas, monospace; font-weight: 700; font-size: 13px;
+    color: var(--accent); background: var(--accent-soft); padding: 4px 10px; border-radius: 8px;
+  }
+  .ticket-head h2 { margin: 0; font-size: 24px; letter-spacing: -.01em; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+  .chip {
+    font-size: 13px; color: var(--muted); background: var(--panel); border: 1px solid var(--line);
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .chip b { color: var(--text); font-weight: 600; }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px;
+  }
+  .card h3 {
+    margin: 0 0 12px; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .intro { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-bottom: 18px; }
+  .intro p { margin: 0; }
+  .first-contact { border-left: 3px solid var(--boss); }
+  .first-contact .route { margin-bottom: 8px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .first-contact p { color: var(--muted); }
+
+  /* ---------- Expected vs Actual ---------- */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .col-label {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 6px;
+  }
+  .col-label.expected { color: var(--ok); background: rgba(52, 211, 153, .12); }
+  .col-label.actual { color: var(--warn); background: rgba(251, 191, 36, .12); }
+
+  ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  ol.steps li {
+    position: relative; padding: 0 0 16px 46px; counter-increment: step;
+  }
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 700; font-size: 13px;
+    background: var(--panel); border: 1px solid var(--line); color: var(--text);
+  }
+  ol.steps li::after {
+    content: ""; position: absolute; left: 15px; top: 32px; bottom: 2px; width: 1px; background: var(--line);
+  }
+  ol.steps li:last-child { padding-bottom: 0; }
+  ol.steps li:last-child::after { display: none; }
+  .route { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin: 3px 0 6px; }
+  .step-text { margin: 0; color: var(--text); }
+  code.tool {
+    font-size: 12.5px; color: #cfe0ff; background: rgba(79, 140, 255, .14); border: 1px solid rgba(79, 140, 255, .28);
+    padding: 1px 6px; border-radius: 6px; white-space: nowrap;
+  }
+  .outcome {
+    margin-top: 18px; padding: 14px 16px; border-radius: 12px;
+    background: rgba(52, 211, 153, .07); border: 1px solid rgba(52, 211, 153, .25);
+  }
+  .outcome strong { color: var(--ok); }
+  .outcome p { margin: 4px 0 0; }
+  .tools-at-a-glance { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .tools-at-a-glance span.label { font-size: 12px; color: var(--faint); margin-right: 4px; text-transform: uppercase; letter-spacing: .08em; }
+
+  .actual-body {
+    min-height: 280px; border: 1.5px dashed var(--line); border-radius: 12px;
+    display: grid; place-items: center; text-align: center; color: var(--faint); padding: 24px;
+  }
+  .actual-body .big { font-size: 16px; color: var(--muted); font-weight: 600; }
+
+  /* ---------- Coming later ---------- */
+  .later { text-align: center; padding: 72px 24px; }
+  .later .badge {
+    display: inline-block; font-weight: 700; color: var(--warn); background: rgba(251, 191, 36, .12);
+    border: 1px solid rgba(251, 191, 36, .3); padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .later h2 { margin: 0 0 6px; }
+  .later p { margin: 0; color: var(--muted); }
+
+  footer { max-width: 1240px; margin: 0 auto; padding: 0 24px 32px; color: var(--faint); font-size: 13px; }
+
+  @media (max-width: 960px) {
+    .intro, .compare { grid-template-columns: 1fr; }
+  }
+  @media print {
+    body { background: #fff; color: #111; }
+    nav.tabs { display: none; }
+    section.panel[hidden] { display: block; }
+    section.panel { break-after: page; }
+    .card { background: #fff; border-color: #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <small>Campus Customs · Multi-Agent Operations</small>
+    <h1>Desk Tickets</h1>
+    <p>Expected plan vs. actual agent behavior · shop date <span class="mono">2026-08-31</span></p>
+  </div>
+  <div class="legend" aria-label="Agents">
+    <span class="agent boss">Boss</span>
+    <span class="agent inventory">Inventory</span>
+    <span class="agent accounting">Accounting</span>
+    <span class="agent facilities">Facilities</span>
+    <span class="agent cs">Customer Service</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="inner" role="tablist" aria-label="Desk tickets">
+    <button class="tab" role="tab" id="tab-101" aria-controls="panel-101" data-tab="101"><span class="num">#101</span>Ticket 101</button>
+    <button class="tab" role="tab" id="tab-102" aria-controls="panel-102" data-tab="102"><span class="num">#102</span>Ticket 102</button>
+    <button class="tab" role="tab" id="tab-103" aria-controls="panel-103" data-tab="103"><span class="num">#103</span>Ticket 103</button>
+    <button class="tab" role="tab" id="tab-cash" aria-controls="panel-cash" data-tab="cash">Cash</button>
+    <button class="tab" role="tab" id="tab-reflection" aria-controls="panel-reflection" data-tab="reflection">Reflection</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ===================== Ticket 101 ===================== -->
+  <section class="panel" id="panel-101" role="tabpanel" aria-labelledby="tab-101">
+    <div class="ticket-head">
+      <span class="ticket-id">TICKET 101</span>
+      <h2>Out-of-Stock Bulldog Tee</h2>
+      <div class="meta">
+        <span class="chip">Type <b>customer_order</b></span>
+        <span class="chip">Requester <b>Tauhid Zaman</b></span>
+        <span class="chip">Item <b class="mono">CC-TEE-WHITE</b> · size <b>S</b> · qty <b>1</b></span>
+        <span class="chip">Linked invoice <b>#501</b></span>
+      </div>
+    </div>
+
+    <div class="intro">
+      <div class="card">
+        <h3>Situation</h3>
+        <p>Tauhid Zaman ordered one Classic Bulldog Tee (<code class="tool">CC-TEE-WHITE</code>), size S, but inventory is zero. Bulldog Print Co has an unpaid $840 invoice (#501) and a five-day lead time.</p>
+      </div>
+      <div class="card first-contact">
+        <h3>First contact</h3>
+        <div class="route"><span class="agent boss">Boss</span><span class="arrow">→</span><span class="agent inventory">Inventory</span></div>
+        <p>Boss should contact Inventory first, because the main problem is fulfilling an out-of-stock order.</p>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="card">
+        <h3><span class="col-label expected">Expected</span> Delegations</h3>
+        <ol class="steps">
+          <li>
+            <div class="route"><span class="agent boss">Boss</span><span class="arrow">→</span><span class="agent inventory">Inventory</span></div>
+            <p class="step-text">Use <code class="tool">get_ticket</code>, <code class="tool">list_inventory</code>, and <code class="tool">list_vendors</code> to confirm the shortage and identify the vendor.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent inventory">Inventory</span><span class="arrow">→</span><span class="agent accounting">Accounting</span></div>
+            <p class="step-text">Ask Accounting to investigate invoice #501 and available cash using <code class="tool">list_invoices</code>, <code class="tool">list_approval_requests</code>, and <code class="tool">get_ticket</code>.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent accounting">Accounting</span><span class="arrow">→</span><span class="agent boss">Boss</span></div>
+            <p class="step-text">Recommend whether to create <code class="tool">request_payment</code> for invoice #501, considering the upcoming rent. Payment must remain pending human approval.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent inventory">Inventory</span></div>
+            <p class="step-text">Use <code class="tool">plan_restock</code> to estimate the cost, lead time, and feasibility. If appropriate, use <code class="tool">request_purchase_order</code>, recognizing that the vendor may remain blocked until the invoice is paid.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent boss">Boss</span><span class="arrow">→</span><span class="agent cs">Customer Service</span></div>
+            <p class="step-text">Use <code class="tool">draft_customer_message</code> to explain the shortage and that restocking is being evaluated, without promising a confirmed delivery date.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent boss">Boss</span></div>
+            <p class="step-text">Use <code class="tool">add_ticket_note</code> and <code class="tool">update_ticket_status</code> to document progress. Do not mark the ticket resolved while required approvals are pending.</p>
+          </li>
+        </ol>
+        <div class="outcome">
+          <strong>Expected outcome</strong>
+          <p>A documented stock shortage, appropriate approval requests if feasible, and an honest customer draft. No unapproved payments or promises.</p>
+        </div>
+        <div class="tools-at-a-glance">
+          <span class="label">MCP tools</span>
+          <code class="tool">get_ticket</code><code class="tool">list_inventory</code><code class="tool">list_vendors</code><code class="tool">list_invoices</code><code class="tool">list_approval_requests</code><code class="tool">request_payment</code><code class="tool">plan_restock</code><code class="tool">request_purchase_order</code><code class="tool">draft_customer_message</code><code class="tool">add_ticket_note</code><code class="tool">update_ticket_status</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="col-label actual">Actual</span> Agent run</h3>
+        <div class="actual-body" id="actual-101">
+          <div><div class="big">Not run yet</div>Filled in after the agents work this ticket.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Ticket 102 ===================== -->
+  <section class="panel" id="panel-102" role="tabpanel" aria-labelledby="tab-102" hidden>
+    <div class="ticket-head">
+      <span class="ticket-id">TICKET 102</span>
+      <h2>Rent Notice</h2>
+      <div class="meta">
+        <span class="chip">Type <b>rent_notice</b></span>
+        <span class="chip">Requester <b>Elm City Properties</b></span>
+        <span class="chip">Lease <b>#1</b> · Chapel Street shop</span>
+        <span class="chip">Due <b>2026-09-02</b></span>
+      </div>
+    </div>
+
+    <div class="intro">
+      <div class="card">
+        <h3>Situation</h3>
+        <p>Elm City Properties requests $2,400 rent, due September 2, 2026. The shop has $3,400 in checking.</p>
+      </div>
+      <div class="card first-contact">
+        <h3>First contact</h3>
+        <div class="route"><span class="agent boss">Boss</span><span class="arrow">→</span><span class="agent facilities">Facilities</span></div>
+        <p>Boss should contact Facilities first, because this is a lease obligation.</p>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="card">
+        <h3><span class="col-label expected">Expected</span> Delegations</h3>
+        <ol class="steps">
+          <li>
+            <div class="route"><span class="agent boss">Boss</span><span class="arrow">→</span><span class="agent facilities">Facilities</span></div>
+            <p class="step-text">Use <code class="tool">get_ticket</code> and <code class="tool">get_lease</code> to confirm the landlord, amount, and due date.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent facilities">Facilities</span><span class="arrow">→</span><span class="agent accounting">Accounting</span></div>
+            <p class="step-text">Ask Accounting to review cash and competing obligations using <code class="tool">get_ticket</code>, <code class="tool">list_invoices</code>, and <code class="tool">list_approval_requests</code>.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent accounting">Accounting</span><span class="arrow">→</span><span class="agent facilities">Facilities</span><span class="slash">/</span><span class="agent boss">Boss</span></div>
+            <p class="step-text">Confirm that paying rent would leave $1,000 before other payments, and flag the $840 outstanding vendor invoice.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent accounting">Accounting</span></div>
+            <p class="step-text">Use <code class="tool">request_payment</code> to prepare the $2,400 rent payment for human approval.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent facilities">Facilities</span><span class="arrow">→</span><span class="agent boss">Boss</span></div>
+            <p class="step-text">Recommend prioritizing the rent payment before its due date.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent boss">Boss</span></div>
+            <p class="step-text">Document the decision with <code class="tool">add_ticket_note</code> and update the ticket status appropriately using <code class="tool">update_ticket_status</code>.</p>
+          </li>
+        </ol>
+        <div class="outcome">
+          <strong>Expected outcome</strong>
+          <p>A rent payment request awaiting human approval. No money moves until a person uses <code class="tool">approve_request</code>.</p>
+        </div>
+        <div class="tools-at-a-glance">
+          <span class="label">MCP tools</span>
+          <code class="tool">get_ticket</code><code class="tool">get_lease</code><code class="tool">list_invoices</code><code class="tool">list_approval_requests</code><code class="tool">request_payment</code><code class="tool">add_ticket_note</code><code class="tool">update_ticket_status</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="col-label actual">Actual</span> Agent run</h3>
+        <div class="actual-body" id="actual-102">
+          <div><div class="big">Not run yet</div>Filled in after the agents work this ticket.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Ticket 103 ===================== -->
+  <section class="panel" id="panel-103" role="tabpanel" aria-labelledby="tab-103" hidden>
+    <div class="ticket-head">
+      <span class="ticket-id">TICKET 103</span>
+      <h2>Yale AI Club Bulk Hoodie Request</h2>
+      <div class="meta">
+        <span class="chip">Type <b>price_override</b></span>
+        <span class="chip">Requester <b>Yale AI Club</b></span>
+        <span class="chip">Item <b class="mono">CC-HOOD-NAVY</b> · size <b>M</b> · qty <b>20</b></span>
+        <span class="chip">In stock <b>8</b> · short <b>12</b></span>
+      </div>
+    </div>
+
+    <div class="intro">
+      <div class="card">
+        <h3>Situation</h3>
+        <p>Yale AI Club wants 20 medium navy hoodies (<code class="tool">CC-HOOD-NAVY</code>), but only 8 are available. Unit cost is $22 and list price is $58.</p>
+      </div>
+      <div class="card first-contact">
+        <h3>First contact</h3>
+        <div class="route"><span class="agent boss">Boss</span><span class="arrow">→</span><span class="agent inventory">Inventory</span></div>
+        <p>Boss should contact Inventory first, because the requested quantity exceeds available stock.</p>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="card">
+        <h3><span class="col-label expected">Expected</span> Delegations</h3>
+        <ol class="steps">
+          <li>
+            <div class="route"><span class="agent boss">Boss</span><span class="arrow">→</span><span class="agent inventory">Inventory</span></div>
+            <p class="step-text">Use <code class="tool">get_ticket</code> and <code class="tool">list_inventory</code> to confirm the 12-unit shortage.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent inventory">Inventory</span></div>
+            <p class="step-text">Use <code class="tool">list_vendors</code> and <code class="tool">plan_restock</code> to evaluate supplier availability, lead time, and replenishment cost.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent inventory">Inventory</span><span class="arrow">→</span><span class="agent accounting">Accounting</span></div>
+            <p class="step-text">Ask Accounting to review restocking affordability and profitability using <code class="tool">quote_bulk_order</code>, <code class="tool">list_invoices</code>, and <code class="tool">list_approval_requests</code>.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent accounting">Accounting</span><span class="arrow">→</span><span class="agent boss">Boss</span></div>
+            <p class="step-text">Report the financial implications. The regular unit margin is $36 (62.1% of selling price), and 12 additional units would cost approximately $264 at the recorded unit cost, before additional charges. Evaluate discounts without going below cost.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent boss">Boss</span></div>
+            <p class="step-text">Make the final discount decision and use <code class="tool">record_discount_decision</code> to save it. Only the Boss should call this tool.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent inventory">Inventory</span><span class="slash">/</span><span class="agent accounting">Accounting</span></div>
+            <p class="step-text">If restocking is feasible, Inventory/Accounting should use <code class="tool">request_purchase_order</code> to prepare the purchase for human approval.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent boss">Boss</span><span class="arrow">→</span><span class="agent cs">Customer Service</span></div>
+            <p class="step-text">Use <code class="tool">draft_customer_message</code> to prepare an accurate response explaining stock availability, the discount decision, and any pending restocking.</p>
+          </li>
+          <li>
+            <div class="route"><span class="agent boss">Boss</span></div>
+            <p class="step-text">Use <code class="tool">add_ticket_note</code> and <code class="tool">update_ticket_status</code> to record progress without marking unresolved obligations complete.</p>
+          </li>
+        </ol>
+        <div class="outcome">
+          <strong>Expected outcome</strong>
+          <p>A documented discount decision, restocking plan or approval request if feasible, and a customer draft. No below-cost discount or unapproved purchase.</p>
+        </div>
+        <div class="tools-at-a-glance">
+          <span class="label">MCP tools</span>
+          <code class="tool">get_ticket</code><code class="tool">list_inventory</code><code class="tool">list_vendors</code><code class="tool">plan_restock</code><code class="tool">quote_bulk_order</code><code class="tool">list_invoices</code><code class="tool">list_approval_requests</code><code class="tool">record_discount_decision</code><code class="tool">request_purchase_order</code><code class="tool">draft_customer_message</code><code class="tool">add_ticket_note</code><code class="tool">update_ticket_status</code>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="col-label actual">Actual</span> Agent run</h3>
+        <div class="actual-body" id="actual-103">
+          <div><div class="big">Not run yet</div>Filled in after the agents work this ticket.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Cash ===================== -->
+  <section class="panel" id="panel-cash" role="tabpanel" aria-labelledby="tab-cash" hidden>
+    <div class="card later">
+      <div class="badge">Coming later</div>
+      <h2>Cash</h2>
+      <p>This tab will be filled in after the agent run.</p>
+    </div>
+  </section>
+
+  <!-- ===================== Reflection ===================== -->
+  <section class="panel" id="panel-reflection" role="tabpanel" aria-labelledby="tab-reflection" hidden>
+    <div class="card later">
+      <div class="badge">Coming later</div>
+      <h2>Reflection</h2>
+      <p>This tab will be filled in after the agent run.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Campus Customs Homework 5 · Expected plans written before the agent run. Actual sections stay empty until the agents work the tickets.
+</footer>
+
+<script>
+  (function () {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+    var ids = tabs.map(function (t) { return t.dataset.tab; });
+
+    function show(id, focus) {
+      if (ids.indexOf(id) === -1) id = ids[0];
+      tabs.forEach(function (t) {
+        var on = t.dataset.tab === id;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+        if (on && focus) t.focus();
+      });
+      if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+    }
+
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { show(t.dataset.tab); });
+      t.addEventListener('keydown', function (e) {
+        var next = null;
+        if (e.key === 'ArrowRight') next = (i + 1) % tabs.length;
+        if (e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length;
+        if (e.key === 'Home') next = 0;
+        if (e.key === 'End') next = tabs.length - 1;
+        if (next !== null) { e.preventDefault(); show(tabs[next].dataset.tab, true); }
+      });
+    });
+
+    window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+    show(location.hash.slice(1));
+  })();
+</script>
+</body>
+</html>

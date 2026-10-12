@@ -1,0 +1,42 @@
+{
+  "note": "Final full run. The reset route copies the original database byte-for-byte and checks the SHA-256 before returning, so the working copy's starting values equal the original file's. They are read here, read-only, from data/campus_customs.db (the original is never modified).",
+  "reset_event_time": "2026-10-12T03:51:43+00:00",
+  "reset_audit_index": 969,
+  "original_sha256": "23686a90d698f7fa6f901a3f0a9774db9cbb31e13151c9e5717275f3321f360a",
+  "starting_cash": [
+    {
+      "name": "checking",
+      "balance": 3400.0,
+      "date": "2026-08-31"
+    }
+  ],
+  "starting_payments_rows": 0,
+  "starting_tickets": [
+    {
+      "id": 101,
+      "status": "open"
+    },
+    {
+      "id": 102,
+      "status": "open"
+    },
+    {
+      "id": 103,
+      "status": "open"
+    }
+  ],
+  "starting_invoices": [
+    {
+      "id": 501,
+      "amount": 840.0,
+      "status": "open"
+    }
+  ],
+  "starting_lease": [
+    {
+      "id": 1,
+      "monthly_rent": 2400.0,
+      "next_due": "2026-09-02"
+    }
+  ]
+}

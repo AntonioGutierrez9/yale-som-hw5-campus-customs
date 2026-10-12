@@ -1,0 +1,36 @@
+# Secrets: never commit real keys (the example file is fine)
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Python
+.venv/
+venv/
+**/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node / Vite
+node_modules/
+dist/
+*.tsbuildinfo
+
+# SQLite temp files (the two .db files in data/ ARE committed on purpose)
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Original download (data/ already has the database)
+data.zip
+
+# Editors, OS, logs
+.vscode/
+.idea/
+.claude/
+.DS_Store
+Thumbs.db
+*.log

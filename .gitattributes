@@ -1,0 +1,4 @@
+# Keep binary files byte-for-byte (databases and screenshots)
+*.db binary
+*.png binary
+*.woff2 binary

@@ -1,0 +1,8 @@
+# All Python dependencies for Campus Customs (backend + MCP server). Tested with Python 3.14.
+# Install into one virtual environment at the repo root:  pip install -r requirements.txt
+pydantic-ai-slim[openai,mcp]>=2.54,<3   # the five agents + MCP client (Portkey uses the OpenAI-compatible client)
+fastmcp>=4.1                            # the MCP server (mcp_server/server.py)
+fastapi>=0.142                          # the dashboard API (backend/main.py)
+uvicorn[standard]>=0.54                 # runs the API
+python-dotenv>=1.2                      # reads PORTKEY_API_KEY from .env
+httpx>=0.28                             # API tests and the report builder

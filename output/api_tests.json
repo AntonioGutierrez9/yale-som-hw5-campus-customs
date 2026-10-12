@@ -1,0 +1,212 @@
+{
+  "passed": 19,
+  "total": 19,
+  "results": [
+    {
+      "test": "POST /api/reset restores the working copy (hash = original)",
+      "passed": true,
+      "detail": {
+        "ok": true,
+        "working_db": "data/campus_customs_new.db",
+        "restored_from": "data/campus_customs.db",
+        "sha256": "23686a90d698f7fa6f901a3f0a9774db9cbb31e13151c9e5717275f3321f360a",
+        "matches_original": true
+      }
+    },
+    {
+      "test": "POST /api/reset without confirm=true -> 422",
+      "passed": true,
+      "detail": {
+        "error": {
+          "code": "invalid_request",
+          "message": "confirm: Input should be True"
+        }
+      }
+    },
+    {
+      "test": "GET /api/health: MCP connected, model gpt-6-luna",
+      "passed": true,
+      "detail": {
+        "ok": true,
+        "mcp_connected": true,
+        "model": "gpt-6-luna",
+        "status": {
+          "busy": false,
+          "action": null,
+          "ticket_id": null,
+          "run_id": null,
+          "started_at": null
+        }
+      }
+    },
+    {
+      "test": "GET /api/tickets: 101/102/103 with status matching the DB",
+      "passed": true,
+      "detail": [
+        {
+          "id": 101,
+          "status": "open",
+          "requester": "Tauhid Zaman"
+        },
+        {
+          "id": 102,
+          "status": "open",
+          "requester": "Elm City Properties"
+        },
+        {
+          "id": 103,
+          "status": "open",
+          "requester": "Yale AI Club"
+        }
+      ]
+    },
+    {
+      "test": "GET /api/tickets/101: tee S stock 0, invoice 501 blocks vendor",
+      "passed": true,
+      "detail": {
+        "requested_size": "S",
+        "qty_in_requested_size": 0,
+        "shortfall": 1,
+        "all_sizes": [
+          {
+            "size": "S",
+            "qty": 0,
+            "location": "Aisle B"
+          },
+          {
+            "size": "M",
+            "qty": 5,
+            "location": "Aisle B"
+          },
+          {
+            "size": "L",
+            "qty": 3,
+            "location": "Aisle B"
+          },
+          {
+            "size": "XL",
+            "qty": 2,
+            "location": "Aisle B"
+          }
+        ]
+      }
+    },
+    {
+      "test": "GET /api/tickets/999 -> 404 with error shape",
+      "passed": true,
+      "detail": {
+        "error": {
+          "code": "ticket_not_found",
+          "message": "Ticket 999 not found."
+        }
+      }
+    },
+    {
+      "test": "GET /api/cash: checking balance matches cash_accounts ($3,400), nothing pending",
+      "passed": true,
+      "detail": {
+        "today": "2026-08-31",
+        "account": "checking",
+        "balance": 3400.0,
+        "as_of": "2026-08-31",
+        "pending_approvals_total": 0,
+        "available_after_pending": 3400.0,
+        "open_invoices_total": 840.0,
+        "rent_due_total": 2400.0,
+        "payments": [],
+        "total_paid": 0
+      }
+    },
+    {
+      "test": "GET /api/approvals: empty after reset",
+      "passed": true,
+      "detail": {
+        "checking_balance": 3400.0,
+        "pending_total": 0,
+        "cash_left_if_all_pending_paid": 3400.0,
+        "requests": []
+      }
+    },
+    {
+      "test": "CORS allows the local React dev server",
+      "passed": true,
+      "detail": {
+        "date": "Mon, 12 Oct 2026 02:39:16 GMT",
+        "server": "uvicorn",
+        "vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Access-Control-Request-Private-Network",
+        "access-control-allow-methods": "GET, POST",
+        "access-control-max-age": "600",
+        "access-control-allow-headers": "Accept, Accept-Language, Content-Language, Content-Type, X-Human-Approval",
+        "access-control-allow-origin": "http://localhost:5173",
+        "content-length": "2",
+        "content-type": "text/plain; charset=utf-8"
+      }
+    },
+    {
+      "test": "approve without X-Human-Approval header -> 403",
+      "passed": true,
+      "detail": {
+        "error": {
+          "code": "human_confirmation_required",
+          "message": "Approvals are human-only: send the header X-Human-Approval: true from the dashboard."
+        }
+      }
+    },
+    {
+      "test": "approve as 'Boss' -> 422 (not a real human name)",
+      "passed": true,
+      "detail": "approved_by: Value error, Enter your first and last name (letters only), e.g. 'Jane Doe'."
+    },
+    {
+      "test": "approve as 'Accounting Agent' -> 422 (not a real human name)",
+      "passed": true,
+      "detail": "approved_by: Value error, Approvals must come from a person, not an agent, AI, or system."
+    },
+    {
+      "test": "approve as 'Antonio' -> 422 (not a real human name)",
+      "passed": true,
+      "detail": "approved_by: Value error, Enter your first and last name (letters only), e.g. 'Jane Doe'."
+    },
+    {
+      "test": "approve as 'gpt-6-luna' -> 422 (not a real human name)",
+      "passed": true,
+      "detail": "approved_by: Value error, Enter your first and last name (letters only), e.g. 'Jane Doe'."
+    },
+    {
+      "test": "approve as 'AI Assistant' -> 422 (not a real human name)",
+      "passed": true,
+      "detail": "approved_by: Value error, Approvals must come from a person, not an agent, AI, or system."
+    },
+    {
+      "test": "approve as 'System Auto' -> 422 (not a real human name)",
+      "passed": true,
+      "detail": "approved_by: Value error, Approvals must come from a person, not an agent, AI, or system."
+    },
+    {
+      "test": "approve with confirm=false -> 422",
+      "passed": true,
+      "detail": {
+        "error": {
+          "code": "invalid_request",
+          "message": "confirm: Input should be True"
+        }
+      }
+    },
+    {
+      "test": "approve unknown request -> 409 from the MCP tool's checks",
+      "passed": true,
+      "detail": {
+        "error": {
+          "code": "approval_refused",
+          "message": "Request 999 not found.",
+          "request_id": 999
+        }
+      }
+    },
+    {
+      "test": "original database never changed",
+      "passed": true,
+      "detail": "23686a90d698f7fa6f901a3f0a9774db9cbb31e13151c9e5717275f3321f360a"
+    }
+  ]
+}

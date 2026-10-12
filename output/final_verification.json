@@ -1,0 +1,227 @@
+{
+  "generated_at": "2026-10-12T04:04:09+00:00",
+  "passed": 26,
+  "total": 26,
+  "checks": [
+    {
+      "check": "ticket 101 status from the API matches the database",
+      "passed": true,
+      "detail": {
+        "api": "approved",
+        "db": "approved"
+      }
+    },
+    {
+      "check": "ticket 101 is NOT reported as resolved unless the database says so",
+      "passed": true,
+      "detail": "approved"
+    },
+    {
+      "check": "ticket 101 has a Customer Service reply draft",
+      "passed": true,
+      "detail": [
+        1
+      ]
+    },
+    {
+      "check": "ticket 102 status from the API matches the database",
+      "passed": true,
+      "detail": {
+        "api": "approved",
+        "db": "approved"
+      }
+    },
+    {
+      "check": "ticket 102 is NOT reported as resolved unless the database says so",
+      "passed": true,
+      "detail": "approved"
+    },
+    {
+      "check": "ticket 102 has a Customer Service reply draft",
+      "passed": true,
+      "detail": [
+        2
+      ]
+    },
+    {
+      "check": "ticket 103 status from the API matches the database",
+      "passed": true,
+      "detail": {
+        "api": "approved",
+        "db": "approved"
+      }
+    },
+    {
+      "check": "ticket 103 is NOT reported as resolved unless the database says so",
+      "passed": true,
+      "detail": "approved"
+    },
+    {
+      "check": "ticket 103 has a Customer Service reply draft",
+      "passed": true,
+      "detail": [
+        3
+      ]
+    },
+    {
+      "check": "payment #1 was approved by a human through an approval request",
+      "passed": true,
+      "detail": {
+        "approved_by": "Antonio Gutierrez",
+        "request": 1
+      }
+    },
+    {
+      "check": "payment #2 was approved by a human through an approval request",
+      "passed": true,
+      "detail": {
+        "approved_by": "Antonio Gutierrez",
+        "request": 2
+      }
+    },
+    {
+      "check": "starting cash − payments = ending cash = cash_accounts (DB) = /api/cash",
+      "passed": true,
+      "detail": {
+        "start": 3400.0,
+        "out": 3240.0,
+        "computed_end": 160.0,
+        "db": 160.0,
+        "api": 160.0
+      }
+    },
+    {
+      "check": "no pending or rejected request was counted as a payment",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "discount approvals moved no cash",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "run fef52e4662 (ticket 101) stayed within step limits",
+      "passed": true,
+      "detail": {
+        "run_id": "fef52e4662",
+        "ticket_id": 101,
+        "team_steps": "19/25",
+        "max_agent_steps": "5/5",
+        "ok": true
+      }
+    },
+    {
+      "check": "run fed70d372e (ticket 102) stayed within step limits",
+      "passed": true,
+      "detail": {
+        "run_id": "fed70d372e",
+        "ticket_id": 102,
+        "team_steps": "16/25",
+        "max_agent_steps": "5/5",
+        "ok": true
+      }
+    },
+    {
+      "check": "run 84b19a1831 (ticket 103) stayed within step limits",
+      "passed": true,
+      "detail": {
+        "run_id": "84b19a1831",
+        "ticket_id": 103,
+        "team_steps": "16/25",
+        "max_agent_steps": "5/5",
+        "ok": true
+      }
+    },
+    {
+      "check": "delegation depth stayed within 4",
+      "passed": true,
+      "detail": 2
+    },
+    {
+      "check": "every model call stayed within 2000 output tokens",
+      "passed": true,
+      "detail": 560
+    },
+    {
+      "check": "only gpt-6-luna was used (model field of every run_start in the final run)",
+      "passed": true,
+      "detail": [
+        "gpt-6-luna"
+      ]
+    },
+    {
+      "check": "Actual section for 101 is built from the audit trail run fef52e4662",
+      "passed": true,
+      "detail": "fef52e4662"
+    },
+    {
+      "check": "Actual section for 102 is built from the audit trail run fed70d372e",
+      "passed": true,
+      "detail": "fed70d372e"
+    },
+    {
+      "check": "Actual section for 103 is built from the audit trail run 84b19a1831",
+      "passed": true,
+      "detail": "84b19a1831"
+    },
+    {
+      "check": "dashboard screenshot for ticket 101 exists and is a PNG",
+      "passed": true,
+      "detail": "output\\screenshots\\dashboard_ticket_101.png"
+    },
+    {
+      "check": "dashboard screenshot for ticket 102 exists and is a PNG",
+      "passed": true,
+      "detail": "output\\screenshots\\dashboard_ticket_102.png"
+    },
+    {
+      "check": "dashboard screenshot for ticket 103 exists and is a PNG",
+      "passed": true,
+      "detail": "output\\screenshots\\dashboard_ticket_103.png"
+    }
+  ],
+  "usage": {
+    "final_full_run": {
+      "model_calls": 51,
+      "input_tokens": 192312,
+      "output_tokens": 9091
+    },
+    "all_runs_since_reset_incl_reply_and_reruns": {
+      "model_calls": 51,
+      "input_tokens": 192312,
+      "output_tokens": 9091
+    },
+    "all_problem9_runs_incl_earlier_attempts": {
+      "model_calls": 181,
+      "input_tokens": 681885,
+      "output_tokens": 30110,
+      "runs": 15
+    }
+  },
+  "limit_checks": [
+    {
+      "run_id": "fef52e4662",
+      "ticket_id": 101,
+      "team_steps": "19/25",
+      "max_agent_steps": "5/5",
+      "ok": true
+    },
+    {
+      "run_id": "fed70d372e",
+      "ticket_id": 102,
+      "team_steps": "16/25",
+      "max_agent_steps": "5/5",
+      "ok": true
+    },
+    {
+      "run_id": "84b19a1831",
+      "ticket_id": 103,
+      "team_steps": "16/25",
+      "max_agent_steps": "5/5",
+      "ok": true
+    }
+  ],
+  "max_output_tokens_in_a_call": 560,
+  "max_delegation_depth": 2
+}

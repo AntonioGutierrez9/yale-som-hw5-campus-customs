@@ -1,0 +1,503 @@
+{
+  "description": "MCP smoke test: each campus-customs tool was called once through the live MCP connection in Claude Code (stdio, configured in .mcp.json). 'output' is the raw tool response; every field was then checked with independent SQL against the working database.",
+  "server": "campus-customs (mcp_server/server.py, FastMCP)",
+  "database": "data/campus_customs_new.db",
+  "run_date": "2026-10-11",
+  "all_passed": true,
+  "tests": [
+    {
+      "prompt": "check_product_stock — check CC-TEE-WHITE, size S, for Ticket 101.",
+      "tool": "check_product_stock",
+      "mcp_tool_name": "mcp__campus-customs__check_product_stock",
+      "arguments": {
+        "sku": "CC-TEE-WHITE",
+        "size": "S"
+      },
+      "tickets": [
+        101
+      ],
+      "output": {
+        "found": true,
+        "sku": "CC-TEE-WHITE",
+        "name": "Classic Bulldog Tee",
+        "size": "S",
+        "qty_available": 0,
+        "in_stock": false,
+        "location": "Aisle B"
+      },
+      "verification": {
+        "all_match": true,
+        "fields_checked": 6,
+        "checks": [
+          {
+            "field": "sku",
+            "tool_value": "CC-TEE-WHITE",
+            "db_value": "CC-TEE-WHITE",
+            "source": "inventory.sku",
+            "match": true
+          },
+          {
+            "field": "name",
+            "tool_value": "Classic Bulldog Tee",
+            "db_value": "Classic Bulldog Tee",
+            "source": "inventory.name",
+            "match": true
+          },
+          {
+            "field": "size",
+            "tool_value": "S",
+            "db_value": "S",
+            "source": "inventory.size",
+            "match": true
+          },
+          {
+            "field": "qty_available",
+            "tool_value": 0,
+            "db_value": 0,
+            "source": "inventory.qty",
+            "match": true
+          },
+          {
+            "field": "location",
+            "tool_value": "Aisle B",
+            "db_value": "Aisle B",
+            "source": "inventory.location",
+            "match": true
+          },
+          {
+            "field": "in_stock",
+            "tool_value": false,
+            "db_value": false,
+            "source": "inventory.qty > 0",
+            "match": true
+          }
+        ]
+      }
+    },
+    {
+      "prompt": "get_financial_status — check the cash balance, unpaid invoices, and rent obligations for Tickets 101 and 102.",
+      "tool": "get_financial_status",
+      "mcp_tool_name": "mcp__campus-customs__get_financial_status",
+      "arguments": {},
+      "tickets": [
+        101,
+        102
+      ],
+      "output": {
+        "today": "2026-08-31",
+        "cash_accounts": [
+          {
+            "name": "checking",
+            "balance": 3400,
+            "date": "2026-08-31"
+          }
+        ],
+        "total_cash": 3400,
+        "open_invoices": [
+          {
+            "invoice_id": 501,
+            "amount": 840,
+            "due_date": "2026-08-28",
+            "status": "open",
+            "description": "Rush reprint CC-TEE-WHITE S",
+            "vendor_id": 1,
+            "vendor_name": "Bulldog Print Co",
+            "specialty": "apparel reprint",
+            "lead_days": 5,
+            "is_overdue": true,
+            "days_overdue": 3,
+            "blocks_vendor_shipping": true
+          }
+        ],
+        "total_open_invoices": 840,
+        "rent_obligations": [
+          {
+            "lease_id": 1,
+            "space_name": "Chapel Street shop",
+            "landlord": "Elm City Properties",
+            "monthly_rent": 2400,
+            "next_due": "2026-09-02",
+            "notes": null,
+            "days_until_due": 2,
+            "is_overdue": false
+          }
+        ],
+        "total_rent_due": 2400,
+        "cash_left_if_all_paid": 160
+      },
+      "verification": {
+        "all_match": true,
+        "fields_checked": 28,
+        "checks": [
+          {
+            "field": "today",
+            "tool_value": "2026-08-31",
+            "db_value": "2026-08-31",
+            "source": "desk.date_today",
+            "match": true
+          },
+          {
+            "field": "cash_accounts[checking].name",
+            "tool_value": "checking",
+            "db_value": "checking",
+            "source": "cash_accounts.name",
+            "match": true
+          },
+          {
+            "field": "cash_accounts[checking].balance",
+            "tool_value": 3400,
+            "db_value": 3400.0,
+            "source": "cash_accounts.balance",
+            "match": true
+          },
+          {
+            "field": "cash_accounts[checking].date",
+            "tool_value": "2026-08-31",
+            "db_value": "2026-08-31",
+            "source": "cash_accounts.date",
+            "match": true
+          },
+          {
+            "field": "total_cash",
+            "tool_value": 3400,
+            "db_value": 3400.0,
+            "source": "SUM(cash_accounts.balance)",
+            "match": true
+          },
+          {
+            "field": "open_invoices count",
+            "tool_value": 1,
+            "db_value": 1,
+            "source": "COUNT(invoices WHERE status='open')",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].invoice_id",
+            "tool_value": 501,
+            "db_value": 501,
+            "source": "invoices.id",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].amount",
+            "tool_value": 840,
+            "db_value": 840.0,
+            "source": "invoices.amount",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].due_date",
+            "tool_value": "2026-08-28",
+            "db_value": "2026-08-28",
+            "source": "invoices.due_date",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].status",
+            "tool_value": "open",
+            "db_value": "open",
+            "source": "invoices.status",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].description",
+            "tool_value": "Rush reprint CC-TEE-WHITE S",
+            "db_value": "Rush reprint CC-TEE-WHITE S",
+            "source": "invoices.description",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].vendor_id",
+            "tool_value": 1,
+            "db_value": 1,
+            "source": "invoices.vendor_id",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].vendor_name",
+            "tool_value": "Bulldog Print Co",
+            "db_value": "Bulldog Print Co",
+            "source": "vendors.name",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].specialty",
+            "tool_value": "apparel reprint",
+            "db_value": "apparel reprint",
+            "source": "vendors.specialty",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].lead_days",
+            "tool_value": 5,
+            "db_value": 5,
+            "source": "vendors.lead_days",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].days_overdue",
+            "tool_value": 3,
+            "db_value": 3,
+            "source": "desk.date_today - invoices.due_date",
+            "match": true
+          },
+          {
+            "field": "open_invoices[501].is_overdue",
+            "tool_value": true,
+            "db_value": true,
+            "source": "desk.date_today > invoices.due_date",
+            "match": true
+          },
+          {
+            "field": "total_open_invoices",
+            "tool_value": 840,
+            "db_value": 840.0,
+            "source": "SUM(invoices.amount WHERE open)",
+            "match": true
+          },
+          {
+            "field": "rent_obligations[1].lease_id",
+            "tool_value": 1,
+            "db_value": 1,
+            "source": "leases.id",
+            "match": true
+          },
+          {
+            "field": "rent_obligations[1].space_name",
+            "tool_value": "Chapel Street shop",
+            "db_value": "Chapel Street shop",
+            "source": "leases.space_name",
+            "match": true
+          },
+          {
+            "field": "rent_obligations[1].landlord",
+            "tool_value": "Elm City Properties",
+            "db_value": "Elm City Properties",
+            "source": "leases.landlord",
+            "match": true
+          },
+          {
+            "field": "rent_obligations[1].monthly_rent",
+            "tool_value": 2400,
+            "db_value": 2400.0,
+            "source": "leases.monthly_rent",
+            "match": true
+          },
+          {
+            "field": "rent_obligations[1].next_due",
+            "tool_value": "2026-09-02",
+            "db_value": "2026-09-02",
+            "source": "leases.next_due",
+            "match": true
+          },
+          {
+            "field": "rent_obligations[1].notes",
+            "tool_value": null,
+            "db_value": null,
+            "source": "leases.notes",
+            "match": true
+          },
+          {
+            "field": "rent_obligations[1].days_until_due",
+            "tool_value": 2,
+            "db_value": 2,
+            "source": "leases.next_due - desk.date_today",
+            "match": true
+          },
+          {
+            "field": "rent_obligations[1].is_overdue",
+            "tool_value": false,
+            "db_value": false,
+            "source": "leases.next_due < desk.date_today",
+            "match": true
+          },
+          {
+            "field": "total_rent_due",
+            "tool_value": 2400,
+            "db_value": 2400.0,
+            "source": "SUM(leases.monthly_rent)",
+            "match": true
+          },
+          {
+            "field": "cash_left_if_all_paid",
+            "tool_value": 160,
+            "db_value": 160.0,
+            "source": "cash - open invoices - rent",
+            "match": true
+          }
+        ]
+      }
+    },
+    {
+      "prompt": "get_product_pricing — check the navy hoodie involved in Ticket 103, using its actual SKU from the database.",
+      "tool": "get_product_pricing",
+      "mcp_tool_name": "mcp__campus-customs__get_product_pricing",
+      "arguments": {
+        "sku": "CC-HOOD-NAVY"
+      },
+      "tickets": [
+        103
+      ],
+      "output": {
+        "found": true,
+        "sku": "CC-HOOD-NAVY",
+        "name": "Basic Hoodie Big Yale",
+        "unit_cost": 22,
+        "list_price": 58,
+        "margin_per_unit": 36,
+        "margin_pct": 62.1,
+        "inventory_by_size": [
+          {
+            "size": "S",
+            "qty": 4,
+            "location": "Aisle A"
+          },
+          {
+            "size": "M",
+            "qty": 8,
+            "location": "Aisle A"
+          },
+          {
+            "size": "L",
+            "qty": 14,
+            "location": "Aisle A"
+          },
+          {
+            "size": "XL",
+            "qty": 6,
+            "location": "Aisle A"
+          }
+        ],
+        "total_qty": 32
+      },
+      "verification": {
+        "all_match": true,
+        "fields_checked": 16,
+        "checks": [
+          {
+            "field": "sku",
+            "tool_value": "CC-HOOD-NAVY",
+            "db_value": "CC-HOOD-NAVY",
+            "source": "pricing.sku",
+            "match": true
+          },
+          {
+            "field": "name",
+            "tool_value": "Basic Hoodie Big Yale",
+            "db_value": "Basic Hoodie Big Yale",
+            "source": "inventory.name",
+            "match": true
+          },
+          {
+            "field": "unit_cost",
+            "tool_value": 22,
+            "db_value": 22.0,
+            "source": "pricing.unit_cost",
+            "match": true
+          },
+          {
+            "field": "list_price",
+            "tool_value": 58,
+            "db_value": 58.0,
+            "source": "pricing.list_price",
+            "match": true
+          },
+          {
+            "field": "margin_per_unit",
+            "tool_value": 36,
+            "db_value": 36.0,
+            "source": "list_price - unit_cost",
+            "match": true
+          },
+          {
+            "field": "margin_pct",
+            "tool_value": 62.1,
+            "db_value": 62.1,
+            "source": "(list_price - unit_cost) / list_price",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size sizes",
+            "tool_value": [
+              "L",
+              "M",
+              "S",
+              "XL"
+            ],
+            "db_value": [
+              "L",
+              "M",
+              "S",
+              "XL"
+            ],
+            "source": "inventory rows for sku",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size[S].qty",
+            "tool_value": 4,
+            "db_value": 4,
+            "source": "inventory.qty",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size[S].location",
+            "tool_value": "Aisle A",
+            "db_value": "Aisle A",
+            "source": "inventory.location",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size[M].qty",
+            "tool_value": 8,
+            "db_value": 8,
+            "source": "inventory.qty",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size[M].location",
+            "tool_value": "Aisle A",
+            "db_value": "Aisle A",
+            "source": "inventory.location",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size[L].qty",
+            "tool_value": 14,
+            "db_value": 14,
+            "source": "inventory.qty",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size[L].location",
+            "tool_value": "Aisle A",
+            "db_value": "Aisle A",
+            "source": "inventory.location",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size[XL].qty",
+            "tool_value": 6,
+            "db_value": 6,
+            "source": "inventory.qty",
+            "match": true
+          },
+          {
+            "field": "inventory_by_size[XL].location",
+            "tool_value": "Aisle A",
+            "db_value": "Aisle A",
+            "source": "inventory.location",
+            "match": true
+          },
+          {
+            "field": "total_qty",
+            "tool_value": 32,
+            "db_value": 32,
+            "source": "SUM(inventory.qty)",
+            "match": true
+          }
+        ]
+      }
+    }
+  ]
+}

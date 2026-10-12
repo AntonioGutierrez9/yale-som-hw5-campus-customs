@@ -1,0 +1,6 @@
+# Python dependencies for the Campus Customs agent team backend (tested with Python 3.14)
+pydantic-ai-slim[openai,mcp]>=2.54,<3   # the five agents + MCP client (Portkey uses the OpenAI-compatible client)
+python-dotenv>=1.2                      # reads PORTKEY_API_KEY from .env
+fastapi>=0.142                          # the dashboard API (main.py)
+uvicorn[standard]>=0.54                 # runs the API
+httpx>=0.28                             # API tests (test_api.py)

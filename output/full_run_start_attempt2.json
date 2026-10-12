@@ -1,0 +1,45 @@
+{
+  "checked_at": "2026-10-12T03:32:49+00:00",
+  "reset_event": "2026-10-12T03:32:37+00:00",
+  "reset_audit_index": 741,
+  "original_sha256": "23686a90d698f7fa6f901a3f0a9774db9cbb31e13151c9e5717275f3321f360a",
+  "starting_cash": [
+    {
+      "name": "checking",
+      "balance": 3400.0,
+      "date": "2026-08-31"
+    }
+  ],
+  "payments_rows": 0,
+  "approval_requests_rows": 0,
+  "customer_drafts_rows": 0,
+  "ticket_notes_rows": 0,
+  "tickets": [
+    {
+      "id": 101,
+      "status": "open"
+    },
+    {
+      "id": 102,
+      "status": "open"
+    },
+    {
+      "id": 103,
+      "status": "open"
+    }
+  ],
+  "invoices": [
+    {
+      "id": 501,
+      "amount": 840.0,
+      "status": "open"
+    }
+  ],
+  "lease": [
+    {
+      "id": 1,
+      "monthly_rent": 2400.0,
+      "next_due": "2026-09-02"
+    }
+  ]
+}
